@@ -804,6 +804,7 @@ export const SwitchTemplate: import("@microsoft/fast-element").ViewTemplate<Swit
 
 // @public
 export class Tab extends FASTElement {
+    disabled: boolean;
 }
 
 // @public
