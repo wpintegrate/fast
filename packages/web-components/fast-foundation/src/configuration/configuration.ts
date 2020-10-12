@@ -1,9 +1,13 @@
 import {
+    css,
     ElementStyles,
     ElementViewTemplate,
     FASTElement,
+    html,
     PartialFASTElementDefinition,
 } from "@microsoft/fast-element";
+import { FoundationProvider, Provider } from "../provider";
+import { display } from "../utilities";
 
 export interface ConfigurationOptions {
     /**
@@ -82,6 +86,11 @@ export interface Configuration {
      * @param name The non-prefixed element tag-name.
      */
     getDefaultStylesFor(name: string): ElementStyles | null;
+
+    /**
+     * Defines a {@link @microsoft/fast-foundation#Provider} for the application.
+     */
+    defineProvider(): { new (): Provider };
 }
 
 export class FASTConfiguration implements Configuration {
@@ -103,7 +112,7 @@ export class FASTConfiguration implements Configuration {
                         ...defaultElementConfiguration,
                         ...elementConfiguration,
                     };
-                    const definition = { name: `${conf.prefix}-${conf.baseName}` };
+                    const definition = { name: this.name(conf.baseName, conf.prefix) };
 
                     configuration
                         .registerElement(defaultElementConfiguration.type, definition)
@@ -150,7 +159,44 @@ export class FASTConfiguration implements Configuration {
         return this.stylesRegistry.get(name) || null;
     }
 
+    /** {@inheritdoc Configuration.defineProvider} */
+    public defineProvider(
+        config: Partial<Omit<ComponentConfiguration, "type">> = {}
+    ): { new (): FoundationProvider } {
+        const { prefix, baseName, template, styles } = config;
+        const def = {
+            name: this.name(baseName || "provider", prefix),
+            template:
+                template ||
+                html`
+                    <slot></slot>
+                `,
+            styles:
+                styles ||
+                css`
+                    ${display("block")}
+                `,
+        };
+
+        class P extends FoundationProvider {
+            public readonly configuration = (this as unknown) as Configuration;
+        }
+
+        FASTElement.define(P, def);
+
+        return P;
+    }
+
     private templateRegistry = new Map<string, ElementViewTemplate | null>();
     private stylesRegistry = new Map<string, ElementStyles | null>();
     private elementRegistry = new Map<typeof FASTElement, PartialFASTElementDefinition>();
+
+    /**
+     * Formats a name and prefix into an element name.
+     * @param baseName The elements base tag name, eg 'button' in <fast-button>
+     * @param prefix The elements prefix, eg 'fast' in <fast-button>
+     */
+    private name(baseName: string, prefix: string = this.prefix): string {
+        return `${prefix}-${baseName}`;
+    }
 }

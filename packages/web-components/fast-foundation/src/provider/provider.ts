@@ -6,7 +6,7 @@ import { Configuration } from "../configuration/configuration";
  * for an element.
  */
 interface ResolveProviderEventDetail {
-    fastProvider: FASTProvider | null;
+    fastProvider: FoundationProvider | null;
 }
 
 export interface Provider extends FASTElement {
@@ -18,7 +18,7 @@ export interface Provider extends FASTElement {
     /**
      * The nearest parent provider element, or null if no parent FASTProvider exists.
      */
-    readonly parentProvider: FASTProvider | null;
+    readonly parentProvider: Provider | null;
 
     /**
      * Resolves a template for an element instance.
@@ -33,19 +33,19 @@ export interface Provider extends FASTElement {
     resolveStylesFor(el: FASTElement): ElementStyles | null;
 }
 
-export abstract class FASTProvider extends FASTElement implements Provider {
+export class FoundationProvider extends FASTElement implements Provider {
     /** {@inheritdoc Provider.configuration} */
-    abstract readonly configuration: Configuration;
+    public readonly configuration: Configuration;
 
     /** {@implements Provider.parentProvider} */
-    public get parentProvider(): FASTProvider | null {
+    public get parentProvider(): Provider | null {
         return this._parentProvider;
     }
 
     /** {@inheritdoc Provider.resolveTemplateFor} */
-    public static resolveProviderFor(el: Element): FASTProvider | null {
+    public static resolveProviderFor(el: Element): Provider | null {
         const event = new CustomEvent<ResolveProviderEventDetail>(
-            FASTProvider.resolveProviderEventName,
+            FoundationProvider.resolveProviderEventName,
             { detail: { fastProvider: null }, bubbles: true, composed: true }
         );
 
@@ -71,7 +71,7 @@ export abstract class FASTProvider extends FASTElement implements Provider {
     /**
      * Private storage for parent FASTProvider.
      */
-    private _parentProvider: FASTProvider | null = null;
+    private _parentProvider: Provider | null = null;
 
     /**
      * Event handler for resolving a FASTProvider.
@@ -86,9 +86,9 @@ export abstract class FASTProvider extends FASTElement implements Provider {
      * Invoked when element is connected to the DOM.
      */
     public connectedCallback() {
-        this._parentProvider = FASTProvider.resolveProviderFor(this);
+        this._parentProvider = FoundationProvider.resolveProviderFor(this);
         this.addEventListener(
-            FASTProvider.resolveProviderEventName,
+            FoundationProvider.resolveProviderEventName,
             this.resolveProviderHandler
         );
 
@@ -98,7 +98,7 @@ export abstract class FASTProvider extends FASTElement implements Provider {
     public disconnectedCallback() {
         this._parentProvider = null;
         this.removeEventListener(
-            FASTProvider.resolveProviderEventName,
+            FoundationProvider.resolveProviderEventName,
             this.resolveProviderHandler
         );
     }
