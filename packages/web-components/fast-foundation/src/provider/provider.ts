@@ -101,5 +101,7 @@ export class FASTProvider extends FASTElement implements Provider {
             FASTProvider.resolveProviderEventName,
             this.resolveProviderHandler
         );
+
+        super.disconnectedCallback();
     }
 }
