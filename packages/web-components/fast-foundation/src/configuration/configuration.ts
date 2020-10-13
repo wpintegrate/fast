@@ -3,10 +3,11 @@ import {
     ElementStyles,
     ElementViewTemplate,
     FASTElement,
+    FASTElementDefinition,
     html,
     PartialFASTElementDefinition,
 } from "@microsoft/fast-element";
-import { FoundationProvider, Provider } from "../provider";
+import { FASTProvider, Provider } from "../provider";
 import { display } from "../utilities";
 
 export interface ConfigurationOptions {
@@ -91,6 +92,16 @@ export interface Configuration {
      * Defines a {@link @microsoft/fast-foundation#Provider} for the application.
      */
     defineProvider(): { new (): Provider };
+
+    /**
+     *
+     * @param registrations Registers registries with the Configuration
+     */
+    register(...registrations: Registry[]): Configuration;
+}
+
+function prefix(prefix: string, base: string) {
+    return `${prefix}-${base}`;
 }
 
 export class FASTConfiguration implements Configuration {
@@ -104,15 +115,17 @@ export class FASTConfiguration implements Configuration {
      */
     public static forComponent(defaultElementConfiguration: ComponentConfiguration) {
         return (
-            elementConfiguration: Partial<Omit<ComponentConfiguration, "type">>
+            elementConfiguration: Partial<Omit<ComponentConfiguration, "type">> = {}
         ): Registry => {
             return {
-                register(configuration) {
+                register(configuration: Configuration) {
                     const conf = {
                         ...defaultElementConfiguration,
                         ...elementConfiguration,
                     };
-                    const definition = { name: this.name(conf.baseName, conf.prefix) };
+                    const definition = {
+                        name: prefix(conf.prefix || configuration.prefix, conf.baseName),
+                    };
 
                     configuration
                         .registerElement(defaultElementConfiguration.type, definition)
@@ -162,41 +175,38 @@ export class FASTConfiguration implements Configuration {
     /** {@inheritdoc Configuration.defineProvider} */
     public defineProvider(
         config: Partial<Omit<ComponentConfiguration, "type">> = {}
-    ): { new (): FoundationProvider } {
-        const { prefix, baseName, template, styles } = config;
+    ): { new (): FASTProvider } {
+        const { prefix: pre, baseName, template, styles } = config;
         const def = {
-            name: this.name(baseName || "provider", prefix),
-            template:
-                template ||
-                html`
-                    <slot></slot>
-                `,
-            styles:
-                styles ||
-                css`
-                    ${display("block")}
-                `,
+            name: prefix(pre || this.prefix, baseName || "provider"),
+            template: template || FASTConfiguration.defaultProviderTemplate,
+            styles: styles || FASTConfiguration.defaultProviderStyles,
         };
 
-        class P extends FoundationProvider {
-            public readonly configuration = (this as unknown) as Configuration;
+        /* eslint-disable-next-line */
+        const that = this;
+        class ConfiguredProvider extends FASTProvider {
+            public readonly configuration = that;
         }
 
-        FASTElement.define(P, def);
+        FASTElement.define(ConfiguredProvider, def);
 
-        return P;
+        return ConfiguredProvider;
     }
 
+    /** {@inheritdoc Configuration.register} */
+    public register(...registrations: Registry[]) {
+        registrations.forEach(x => x.register(this));
+        return this;
+    }
+
+    private static defaultProviderTemplate: ElementViewTemplate = html`
+        <slot></slot>
+    `;
+    private static defaultProviderStyles: ElementStyles = css`
+        ${display("block")}
+    `;
     private templateRegistry = new Map<string, ElementViewTemplate | null>();
     private stylesRegistry = new Map<string, ElementStyles | null>();
     private elementRegistry = new Map<typeof FASTElement, PartialFASTElementDefinition>();
-
-    /**
-     * Formats a name and prefix into an element name.
-     * @param baseName The elements base tag name, eg 'button' in <fast-button>
-     * @param prefix The elements prefix, eg 'fast' in <fast-button>
-     */
-    private name(baseName: string, prefix: string = this.prefix): string {
-        return `${prefix}-${baseName}`;
-    }
 }

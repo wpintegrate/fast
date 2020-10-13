@@ -6,7 +6,7 @@ import { Configuration } from "../configuration/configuration";
  * for an element.
  */
 interface ResolveProviderEventDetail {
-    fastProvider: FoundationProvider | null;
+    fastProvider: FASTProvider | null;
 }
 
 export interface Provider extends FASTElement {
@@ -33,7 +33,7 @@ export interface Provider extends FASTElement {
     resolveStylesFor(el: FASTElement): ElementStyles | null;
 }
 
-export class FoundationProvider extends FASTElement implements Provider {
+export class FASTProvider extends FASTElement implements Provider {
     /** {@inheritdoc Provider.configuration} */
     public readonly configuration: Configuration;
 
@@ -45,7 +45,7 @@ export class FoundationProvider extends FASTElement implements Provider {
     /** {@inheritdoc Provider.resolveTemplateFor} */
     public static resolveProviderFor(el: Element): Provider | null {
         const event = new CustomEvent<ResolveProviderEventDetail>(
-            FoundationProvider.resolveProviderEventName,
+            FASTProvider.resolveProviderEventName,
             { detail: { fastProvider: null }, bubbles: true, composed: true }
         );
 
@@ -86,9 +86,9 @@ export class FoundationProvider extends FASTElement implements Provider {
      * Invoked when element is connected to the DOM.
      */
     public connectedCallback() {
-        this._parentProvider = FoundationProvider.resolveProviderFor(this);
+        this._parentProvider = FASTProvider.resolveProviderFor(this);
         this.addEventListener(
-            FoundationProvider.resolveProviderEventName,
+            FASTProvider.resolveProviderEventName,
             this.resolveProviderHandler
         );
 
@@ -98,7 +98,7 @@ export class FoundationProvider extends FASTElement implements Provider {
     public disconnectedCallback() {
         this._parentProvider = null;
         this.removeEventListener(
-            FoundationProvider.resolveProviderEventName,
+            FASTProvider.resolveProviderEventName,
             this.resolveProviderHandler
         );
     }

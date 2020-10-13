@@ -4,7 +4,7 @@ import {
     FASTElement,
     observable,
 } from "@microsoft/fast-element";
-import { FoundationProvider, Provider } from "../provider";
+import { FASTProvider, Provider } from "../provider";
 
 /**
  * Defines a foundation element class that:
@@ -69,7 +69,7 @@ export abstract class FASTFoundation extends FASTElement {
      * Invoked when element is connected to the DOM.
      */
     public connectedCallback() {
-        this._$fastProvider = FoundationProvider.resolveProviderFor(this);
+        this._$fastProvider = FASTProvider.resolveProviderFor(this);
         super.connectedCallback();
     }
 }
