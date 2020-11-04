@@ -546,6 +546,10 @@ export class MenuItem extends FASTElement {
     // @internal (undocumented)
     handleMenuItemKeyDown: (e: KeyboardEvent) => boolean;
     role: MenuItemRole;
+    // Warning: (ae-forgotten-export) The symbol "AnchoredRegion" needs to be exported by the entry point index.d.ts
+    //
+    // @internal
+    subMenuRegion: AnchoredRegion | string;
 }
 
 // @internal
@@ -790,6 +794,8 @@ export class Switch extends FormAssociated<HTMLInputElement> {
     defaultChecked: boolean;
     // @internal (undocumented)
     defaultSlottedNodes: Node[];
+    // (undocumented)
+    formResetCallback(): void;
     // @internal
     protected initialValue: string;
     // @internal (undocumented)
@@ -975,8 +981,6 @@ export class Tooltip extends FASTElement {
     // @internal (undocumented)
     horizontalScaling: AxisScalingMode;
     position: TooltipPosition;
-    // Warning: (ae-forgotten-export) The symbol "AnchoredRegion" needs to be exported by the entry point index.d.ts
-    //
     // @internal
     region: AnchoredRegion;
     // @internal (undocumented)
