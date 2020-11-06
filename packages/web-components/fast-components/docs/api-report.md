@@ -21,9 +21,9 @@ import { Direction } from '@microsoft/fast-web-utilities';
 import { Divider } from '@microsoft/fast-foundation';
 import { Flipper } from '@microsoft/fast-foundation';
 import { Listbox } from '@microsoft/fast-foundation';
+import { ListboxOption } from '@microsoft/fast-foundation';
 import { Menu } from '@microsoft/fast-foundation';
 import { MenuItem } from '@microsoft/fast-foundation';
-import { Option as Option_2 } from '@microsoft/fast-foundation';
 import { Radio } from '@microsoft/fast-foundation';
 import { RadioGroup } from '@microsoft/fast-foundation';
 import { Select } from '@microsoft/fast-foundation';
@@ -269,8 +269,6 @@ export class FASTBreadcrumbItem extends BreadcrumbItem {
 export class FASTButton extends Button {
     appearance: ButtonAppearance;
     // (undocumented)
-    appearanceChanged(oldValue: ButtonAppearance, newValue: ButtonAppearance): void;
-    // (undocumented)
     connectedCallback(): void;
 }
 
@@ -499,7 +497,7 @@ export class FASTMenuItem extends MenuItem {
 }
 
 // @public
-export class FASTOption extends Option_2 {
+export class FASTOption extends ListboxOption {
 }
 
 // @public
@@ -554,16 +552,12 @@ export class FASTTabs extends Tabs {
 export class FASTTextArea extends TextArea {
     appearance: TextAreaAppearance;
     // @internal (undocumented)
-    appearanceChanged(oldValue: TextAreaAppearance, newValue: TextAreaAppearance): void;
-    // @internal (undocumented)
     connectedCallback(): void;
 }
 
 // @public
 export class FASTTextField extends TextField {
     appearance: TextFieldAppearance;
-    // @internal (undocumented)
-    appearanceChanged(oldValue: TextFieldAppearance, newValue: TextFieldAppearance): void;
     // @internal (undocumented)
     connectedCallback(): void;
 }

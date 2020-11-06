@@ -312,6 +312,11 @@ export class DelegatesARIAListbox extends ARIAGlobalStatesAndProperties {
 }
 
 // @public
+export class DelegatesARIASelect extends ARIAGlobalStatesAndProperties {
+    ariaExpanded: "true" | "false" | undefined;
+}
+
+// @public
 export class DelegatesARIATextbox extends ARIAGlobalStatesAndProperties {
 }
 
@@ -500,31 +505,32 @@ export function isDesignSystemConsumer(element: HTMLElement | DesignSystemConsum
 export function isTreeItemElement(el: Element): el is HTMLElement;
 
 // Warning: (ae-different-release-tags) This symbol has another declaration with a different release tag
+// Warning: (ae-incompatible-release-tags) The symbol "Listbox" is marked as @public, but its signature references "FormAssociated" which is marked as @alpha
 // Warning: (ae-internal-mixed-release-tag) Mixed release tags are not allowed for "Listbox" because one of its declarations is marked as @internal
 //
 // @public
-export abstract class Listbox extends FASTElement {
-    // @internal (undocumented)
+export class Listbox extends FormAssociated<HTMLSelectElement> {
+    // @internal
     clickHandler(e: MouseEvent): boolean | void;
     // @internal (undocumented)
     connectedCallback(): void;
-    disabled: boolean;
     // @internal (undocumented)
-    get firstSelectedOption(): Option_2;
+    get firstSelectedOption(): ListboxOption;
     // @internal (undocumented)
     focusinHandler(e: FocusEvent): void;
-    // (undocumented)
-    handleTypeAhead(typedKey: any): void;
+    handleTypeAhead(key: any): void;
+    // @internal
+    keydownHandler(e: KeyboardEvent): boolean | void;
     // @internal (undocumented)
-    keydownHandler(e: KeyboardEvent): void | boolean;
-    // @internal (undocumented)
-    options: Option_2[];
+    options: ListboxOption[];
     // (undocumented)
-    protected optionsChanged(prev: Option_2[], next: Option_2[]): void;
+    protected optionsChanged(prev: any, next: any): void;
+    protected proxy: HTMLSelectElement;
+    role: string;
     selectedIndex: number;
-    selectedOptions: Option_2[];
+    selectedOptions: ListboxOption[];
     // (undocumented)
-    protected selectedOptionsChanged(prev?: Option_2[], next?: Option_2[]): void;
+    protected selectedOptionsChanged(prev: any, next: any): void;
     // @internal
     selectFirstOption(): void;
     // @internal
@@ -534,13 +540,61 @@ export abstract class Listbox extends FASTElement {
     // @internal
     selectPreviousOption(): void;
     // @internal (undocumented)
-    protected setSelectedOption(index?: number): void;
-    static slottedOptionFilter: (n: Option_2) => boolean;
+    setSelectedOption(index?: number): void;
+    static slottedOptionFilter: (n: ListboxOption) => boolean;
+    // @internal
+    protected typeAheadExpired: boolean;
     }
 
 // @internal (undocumented)
 export interface Listbox extends DelegatesARIAListbox {
 }
+
+// Warning: (ae-different-release-tags) This symbol has another declaration with a different release tag
+// Warning: (ae-internal-mixed-release-tag) Mixed release tags are not allowed for "ListboxOption" because one of its declarations is marked as @internal
+//
+// @public
+export class ListboxOption extends FASTElement {
+    constructor();
+    defaultSelected: boolean;
+    // (undocumented)
+    protected defaultSelectedChanged(): void;
+    disabled: boolean;
+    // (undocumented)
+    get form(): HTMLFormElement | null;
+    // (undocumented)
+    index: number;
+    // (undocumented)
+    get label(): string;
+    // (undocumented)
+    proxy: HTMLOptionElement;
+    role: ListboxOptionRole;
+    selected: boolean;
+    selectedAttribute: boolean;
+    // (undocumented)
+    protected selectedAttributeChanged(): void;
+    // (undocumented)
+    protected selectedChanged(oldValue: any, newValue: any): void;
+    // (undocumented)
+    get text(): string;
+    // (undocumented)
+    get value(): string;
+    set value(value: string);
+    valueAttribute: string;
+}
+
+// @internal (undocumented)
+export interface ListboxOption extends StartEnd {
+}
+
+// @public
+export enum ListboxOptionRole {
+    // (undocumented)
+    option = "option"
+}
+
+// @public
+export const ListboxOptionTemplate: import("@microsoft/fast-element").ViewTemplate<ListboxOption, any>;
 
 // @public
 export const ListboxTemplate: import("@microsoft/fast-element").ViewTemplate<Listbox, any>;
@@ -618,36 +672,6 @@ export const MenuItemTemplate: import("@microsoft/fast-element").ViewTemplate<Me
 
 // @public
 export const MenuTemplate: import("@microsoft/fast-element").ViewTemplate<Menu, any>;
-
-// @public
-class Option_2 extends FASTElement {
-    // (undocumented)
-    connectedCallback(): void;
-    defaultSelected: boolean;
-    disabled: boolean;
-    // (undocumented)
-    get label(): string;
-    // (undocumented)
-    proxy: HTMLOptionElement;
-    selected: boolean;
-    selectedAttribute: boolean;
-    // (undocumented)
-    get text(): string;
-    // (undocumented)
-    get value(): string;
-    valueAttribute: string;
-}
-
-export { Option_2 as Option }
-
-// @public
-export enum OptionRole {
-    // (undocumented)
-    option = "option"
-}
-
-// @public
-export const OptionTemplate: import("@microsoft/fast-element").ViewTemplate<Option_2, any>;
 
 // @public
 export const ProgressRingTemplate: import("@microsoft/fast-element").ViewTemplate<BaseProgress, any>;
@@ -738,29 +762,37 @@ export class Select extends Listbox {
     open: boolean;
     // (undocumented)
     protected openChanged(): void;
-    positioning: SelectPositioning;
+    // (undocumented)
+    position: SelectPosition;
+    positionAttribute: SelectPosition;
     // (undocumented)
     protected proxy: HTMLSelectElement;
+    role: SelectRole;
     // @internal
-    protected selectedOptionsChanged(prev?: Option_2[], next?: Option_2[]): void;
-    setPositioning(force?: SelectPositioning): void;
+    protected selectedOptionsChanged(prev: any, next: any): void;
+    setPositioning(): void;
     // (undocumented)
     value: string;
+    // (undocumented)
+    protected valueChanged(previous: any, next: any): void;
 }
 
-// Warning: (ae-forgotten-export) The symbol "FormAssociatedSelect" needs to be exported by the entry point index.d.ts
-// Warning: (ae-forgotten-export) The symbol "DelegatesARIASelect" needs to be exported by the entry point index.d.ts
-//
 // @internal (undocumented)
-export interface Select extends FormAssociatedSelect, StartEnd, DelegatesARIASelect {
+export interface Select extends StartEnd, DelegatesARIASelect {
 }
 
 // @public
-export enum SelectPositioning {
+export enum SelectPosition {
     // (undocumented)
     above = "above",
     // (undocumented)
     below = "below"
+}
+
+// @public
+export enum SelectRole {
+    // (undocumented)
+    combobox = "combobox"
 }
 
 // @public
@@ -922,6 +954,8 @@ export class Switch extends FormAssociated<HTMLInputElement> {
     defaultChecked: boolean;
     // @internal (undocumented)
     defaultSlottedNodes: Node[];
+    // (undocumented)
+    formResetCallback(): void;
     // @internal
     protected initialValue: string;
     // @internal (undocumented)

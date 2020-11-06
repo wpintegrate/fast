@@ -1,7 +1,8 @@
+import { customElement, DOM } from "@microsoft/fast-element";
 import { expect } from "chai";
-import { customElement, DOM, html } from "@microsoft/fast-element";
-import { OptionTemplate as itemTemplate, Option } from "../option";
 import { fixture } from "../fixture";
+import { ListboxOption } from "../listbox-option/listbox-option";
+import { ListboxOptionTemplate as itemTemplate } from "../listbox-option/listbox-option.template";
 import { Listbox, ListboxTemplate as template } from "./index";
 
 @customElement({
@@ -16,7 +17,7 @@ describe("Listbox", () => {
         name: "fast-option",
         template: itemTemplate,
     })
-    class FASTOption extends Option {}
+    class FASTListboxOption extends ListboxOption {}
 
     async function setup() {
         const { element, connect, disconnect } = await fixture<FASTListbox>(
@@ -24,12 +25,13 @@ describe("Listbox", () => {
         );
 
         const option1 = document.createElement("fast-option");
-        const option2 = document.createElement("fast-option");
-        const option3 = document.createElement("fast-option");
+        (option1 as FASTListboxOption).textContent = "option 1";
 
-        (option1 as FASTOption).className = "one";
-        (option2 as FASTOption).className = "two";
-        (option3 as FASTOption).className = "three";
+        const option2 = document.createElement("fast-option");
+        (option2 as FASTListboxOption).textContent = "option 2";
+
+        const option3 = document.createElement("fast-option");
+        (option3 as FASTListboxOption).textContent = "option 3";
 
         element.appendChild(option1);
         element.appendChild(option2);
@@ -66,12 +68,26 @@ describe("Listbox", () => {
         await disconnect();
     });
 
-    it("should NOT set a default `aria-disabled` value when `disabled` is not defined", async () => {
+    it("should have a tabindex of 0 when `disabled` is not defined", async () => {
         const { element, connect, disconnect } = await setup();
 
         await connect();
 
-        expect(element.getAttribute("aria-disabled")).to.equal(null);
+        expect(element.getAttribute("tabindex")).to.equal("0");
+
+        await disconnect();
+    });
+
+    it("should NOT have a tabindex when `disabled` is true", async () => {
+        const { element, connect, disconnect } = await setup();
+
+        await connect();
+
+        element.disabled = true;
+
+        await DOM.nextUpdate();
+
+        expect(element.getAttribute("tabindex")).to.equal(null);
 
         await disconnect();
     });

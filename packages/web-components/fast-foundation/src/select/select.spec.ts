@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { customElement, DOM, html } from "@microsoft/fast-element";
-import { OptionTemplate, Option } from "../option";
+import { ListboxOptionTemplate, ListboxOption } from "../listbox-option";
 import { fixture } from "../fixture";
 import { Select, SelectTemplate } from "./index";
 
@@ -14,9 +14,9 @@ class FASTSelect extends Select {}
 describe("Select", () => {
     @customElement({
         name: "fast-option",
-        template: OptionTemplate,
+        template: ListboxOptionTemplate,
     })
-    class FASTOption extends Option {}
+    class FASTOption extends ListboxOption {}
 
     async function setup() {
         const { element, connect, disconnect } = await fixture<FASTSelect>("fast-select");
@@ -36,6 +36,16 @@ describe("Select", () => {
         return { element, connect, disconnect, option1, option2, option3 };
     }
 
+    it("should include a role of `combobox`", async () => {
+        const { element, connect, disconnect } = await setup();
+
+        await connect();
+
+        expect(element.getAttribute("role")).to.equal("combobox");
+
+        await disconnect();
+    });
+
     it("should set the `aria-disabled` attribute equal to the `disabled` value", async () => {
         const { element, connect, disconnect } = await setup();
 
@@ -50,16 +60,6 @@ describe("Select", () => {
         await DOM.nextUpdate();
 
         expect(element.getAttribute("aria-disabled")).to.equal("false");
-
-        await disconnect();
-    });
-
-    it("should NOT set a default `aria-disabled` value when `disabled` is not defined", async () => {
-        const { element, connect, disconnect } = await setup();
-
-        await connect();
-
-        expect(element.getAttribute("aria-disabled")).to.equal(null);
 
         await disconnect();
     });

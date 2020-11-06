@@ -1,4 +1,7 @@
 import { attr, FASTElement, observable } from "@microsoft/fast-element";
+import { StartEnd } from "../patterns/start-end";
+import { applyMixins } from "../utilities/apply-mixins";
+import { ListboxOptionRole } from "./listbox-option.options";
 
 /**
  * An Option Custom HTML Element.
@@ -6,8 +9,9 @@ import { attr, FASTElement, observable } from "@microsoft/fast-element";
  *
  * @public
  */
-export class Option extends FASTElement {
-    public proxy: HTMLOptionElement = document.createElement("option");
+export class ListboxOption extends FASTElement {
+    index: number;
+    public proxy: HTMLOptionElement;
 
     /**
      * The defaultSelected state of the option.
@@ -15,7 +19,7 @@ export class Option extends FASTElement {
      */
     @observable
     public defaultSelected: boolean = false;
-    private defaultSelectedChanged(): void {
+    protected defaultSelectedChanged(): void {
         if (!this.dirtySelected) {
             this.selected = this.defaultSelected;
         }
@@ -37,6 +41,16 @@ export class Option extends FASTElement {
     public disabled: boolean;
 
     /**
+     * The role of the element.
+     *
+     * @public
+     * @remarks
+     * HTML Attribute: role
+     */
+    @attr
+    public role: ListboxOptionRole = ListboxOptionRole.option;
+
+    /**
      * The selected attribute value. This sets the initial selected value.
      *
      * @public
@@ -45,7 +59,7 @@ export class Option extends FASTElement {
      */
     @attr({ attribute: "selected", mode: "boolean" })
     public selectedAttribute: boolean;
-    private selectedAttributeChanged(): void {
+    protected selectedAttributeChanged(): void {
         this.defaultSelected = this.selectedAttribute;
     }
 
@@ -56,10 +70,14 @@ export class Option extends FASTElement {
      */
     @observable
     public selected: boolean = this.defaultSelected;
-    private selectedChanged(oldValue, newValue): void {
+    protected selectedChanged(oldValue, newValue): void {
         if (this.$fastController.isConnected) {
             if (!this.dirtySelected) {
                 this.dirtySelected = true;
+            }
+
+            if (this.proxy) {
+                this.proxy.selected = this.selected;
             }
 
             this.classList.toggle("selected", oldValue !== newValue ? newValue : false);
@@ -68,10 +86,6 @@ export class Option extends FASTElement {
                 this.$emit("change");
             }
         }
-    }
-
-    public get value(): string {
-        return this.valueAttribute ? this.valueAttribute : this.textContent || "";
     }
 
     /**
@@ -91,14 +105,34 @@ export class Option extends FASTElement {
         return this.textContent ? this.textContent : this.value;
     }
 
-    public connectedCallback() {
-        super.connectedCallback();
+    public get value(): string {
+        return this.valueAttribute ? this.valueAttribute : this.textContent || "";
+    }
 
-        this.proxy.label = this.label;
-        this.proxy.defaultSelected = this.defaultSelected;
-        this.proxy.selected = this.selected;
-        this.proxy.text = this.text;
+    public set value(value) {
+        if (this.proxy) {
+            this.proxy.value = value;
+        }
+    }
+
+    public get form(): HTMLFormElement | null {
+        return this.proxy ? this.proxy.form : null;
+    }
+
+    public constructor() {
+        super();
+        this.proxy = new Option(
+            this.text,
+            this.value,
+            this.defaultSelected,
+            this.selected
+        );
         this.proxy.disabled = this.disabled;
-        this.proxy.value = this.value;
     }
 }
+
+/**
+ * @internal
+ */
+export interface ListboxOption extends StartEnd {}
+applyMixins(ListboxOption, StartEnd);
