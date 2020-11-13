@@ -730,8 +730,7 @@ export const DesignTokens: InterfaceSymbol<FASTDesignTokenLibrary<any>>;
 export const DI: Readonly<{
     createContainer(): Container;
     getOrCreateDOMContainer(element?: HTMLElement): Container;
-    createInterface<K extends Key>(friendlyName?: string): DefaultableInterfaceSymbol<K, any>;
-    createDOMInterface<K_1 extends Key>(friendlyName?: string): DefaultableInterfaceSymbol<K_1, HTMLElement & FASTElement>;
+    createInterface: typeof createInterface;
     getDesignParamtypes(Type: Constructable | Injectable): readonly Key[] | undefined;
     getAnnotationParamtypes(Type: Constructable | Injectable): readonly Key[] | undefined;
     getOrCreateAnnotationParamTypes(Type: Constructable | Injectable): Key[];
@@ -826,6 +825,7 @@ export class FactoryImpl<T extends Constructable = any> implements Factory<T> {
 
 // @public (undocumented)
 export class FASTCustomPropertyManager {
+    constructor(selector?: "host" | "root");
     // Warning: (ae-unresolved-inheritdoc-reference) The @inheritDoc reference could not be resolved: No member was found with name "alias"
     //
     // (undocumented)
@@ -983,6 +983,12 @@ export const inject: (...dependencies: Key[]) => (target: Injectable, key?: stri
 export type Injectable<T = {}> = Constructable<T> & {
     inject?: Key[];
 };
+
+// @public (undocumented)
+export interface InterfaceConfiguration {
+    friendlyName?: string;
+    respectConnection?: boolean;
+}
 
 // @public (undocumented)
 export type InterfaceSymbol<Key = any, TBase extends {} = {}> = (target: TBase, property: string, index?: number) => void;
@@ -1700,6 +1706,10 @@ export const TreeViewTemplate: import("@microsoft/fast-element").ViewTemplate<Tr
 // @public
 export function unprefix(name: string): string;
 
+
+// Warnings were encountered during analysis:
+//
+// dist/dts/di/di.d.ts:105:5 - (ae-forgotten-export) The symbol "createInterface" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 
