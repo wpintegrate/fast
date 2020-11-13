@@ -229,6 +229,8 @@ export interface Configuration {
     readonly prefix: string;
     // (undocumented)
     register(...registrations: ConfigurationRegistry[]): Configuration;
+    // Warning: (ae-forgotten-export) The symbol "DesignTokenRegistration" needs to be exported by the entry point index.d.ts
+    registerDesignToken<T>(registration: DesignTokenRegistration<T>): Configuration;
     registerElement(type: typeof FASTElement, definition: PartialFASTElementDefinition): Configuration;
     setDefaultStylesFor(baseName: string, styles: ElementStyles | null): Configuration;
     setDefaultTemplateFor(baseName: string, template: ElementViewTemplate | null): Configuration;
@@ -243,6 +245,7 @@ export class ConfigurationImpl implements Configuration {
     readonly prefix: string;
     // (undocumented)
     register(...registrations: ConfigurationRegistry[]): this;
+    registerDesignToken<T>(registration: DesignTokenRegistration<T>): this;
     registerElement(type: typeof FASTElement, definition: PartialFASTElementDefinition): this;
     setDefaultStylesFor(name: string, styles: ElementStyles | null): this;
     setDefaultTemplateFor(name: string, template: ElementViewTemplate | null): this;
@@ -957,9 +960,6 @@ export abstract class FormAssociated<T extends HTMLInputElement | HTMLTextAreaEl
 
 // @public
 export abstract class FoundationElement extends FASTElement {
-    // Warning: (ae-forgotten-export) The symbol "Provider" needs to be exported by the entry point index.d.ts
-    get $fastProvider(): Provider | null;
-    connectedCallback(): void;
     protected resolveStyles(): ElementStyles | null;
     protected resolveTemplate(): ElementViewTemplate | null;
     styles: ElementStyles | void | null;
